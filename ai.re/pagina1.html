@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Contador - ai.re</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      font-family: 'Kanit', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .logo {
+      font-size: 2em;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .circle-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin-bottom: 40px;
+    }
+
+    .circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 10px solid #1e1e1e;
+      position: relative;
+    }
+
+    .circle::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 100%;
+      height: 100%;
+      border: 10px solid #42f59b;
+      border-radius: 50%;
+      border-top-color: transparent;
+      border-left-color: transparent;
+      animation: spin 3s linear infinite paused;
+    }
+
+    .circle.running::after {
+      animation-play-state: running;
+    }
+
+    .time-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .time-display h1 {
+      font-size: 3.2em;
+      margin: 0;
+    }
+
+    .time-display small {
+      font-size: 1em;
+      color: #aaa;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .button-container {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .activity-btn {
+      background-color: #121212;
+      border-radius: 20px;
+      padding: 20px;
+      width: 100px;
+      height: 100px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      color: white;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      text-decoration: none;
+    }
+
+    .activity-btn:hover {
+      background-color: #1e1e1e;
+    }
+
+    .activity-btn img {
+      width: 28px;
+      margin-bottom: 10px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .control-btn {
+      padding: 1em 2em;
+      font-size: 1.2em;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s ease;
+    }
+
+    .start-btn {
+      background-color: white;
+      color: black;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .finish-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .finish-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .records-btn {
+      margin-top: 20px;
+      background-color: #42f59b;
+      color: black;
+      border: none;
+      padding: 12px 24px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 1em;
+    }
+
+    .records-btn:hover {
+      background-color: #2bd48a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo">ai.re</div>
+
+  <div class="circle-container">
+    <div class="circle" id="circle">
+      <div class="time-display">
+        <h1 id="time">12:00:00</h1>
+        <small>horas minutos segundos</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="button-container">
+    <button class="activity-btn">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/bed.png" alt="Dormir">
+      Dormir
+    </button>
+    <a class="activity-btn" href="deporte.html">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/running.png" alt="Deporte">
+      Deporte
+    </a>
+    <button class="activity-btn">
+      <img src="https://img.icons8.com/ios-filled/50/ffffff/more.png" alt="Otra">
+      Otra actividad
+    </button>
+  </div>
+
+  <div class="controls">
+    <button class="control-btn start-btn" onclick="startCountdown()">Empezar</button>
+    <button class="control-btn finish-btn" onclick="finalizar()">Finalizar</button>
+  </div>
+
+  <a class="records-btn" href="registros.html">Registros</a>
+
+  <script>
+    let totalSeconds = 12 * 3600;
+    let interval = null;
+
+    function formatTimeUnit(unit) {
+      return String(unit).padStart(2, '0');
+    }
+
+    function updateDisplay() {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      document.getElementById('time').textContent =
+        `${formatTimeUnit(hours)}:${formatTimeUnit(minutes)}:${formatTimeUnit(seconds)}`;
+    }
+
+    function startCountdown() {
+      if (interval) return;
+      document.getElementById('circle').classList.add('running');
+      updateDisplay();
+      interval = setInterval(() => {
+        if (totalSeconds > 0) {
+          totalSeconds--;
+          updateDisplay();
+        } else {
+          finalizar();
+        }
+      }, 1000);
+    }
+
+    function finalizar() {
+      clearInterval(interval);
+      interval = null;
+      document.getElementById('circle').classList.remove('running');
+      saveRecord();
+    }
+
+    function saveRecord() {
+      const now = new Date();
+      const timeStr = document.getElementById('time').textContent;
+      const record = {
+        time: timeStr,
+        date: now.toLocaleDateString(),
+        hour: now.toLocaleTimeString()
+      };
+      let records = JSON.parse(localStorage.getItem('registros') || '[]');
+      records.unshift(record);
+      localStorage.setItem('registros', JSON.stringify(records));
+      alert('Tiempo guardado en registros');
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contador de Tira Nasal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background-color: black;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+    }
+
+    svg {
+      transform: rotate(-90deg);
+    }
+
+    .time-display {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .time-display h1 {
+      font-size: 3.5em;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .time-display p {
+      font-size: 1.2em;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <svg width="300" height="300">
+      <circle cx="150" cy="150" r="140" stroke="#333" stroke-width="15" fill="none" />
+      <circle id="progress" cx="150" cy="150" r="140" stroke="white" stroke-width="15" fill="none"
+        stroke-linecap="round" stroke-dasharray="880" stroke-dashoffset="0" />
+    </svg>
+    <div class="time-display">
+      <h1 id="hours">12</h1>
+      <p id="min-sec">00:00</p>
+    </div>
+  </div>
+
+  <script>
+    const totalTime = 12 * 60 * 60; // 12 horas en segundos
+    let remaining = totalTime;
+
+    const circle = document.getElementById("progress");
+    const circumference = 2 * Math.PI * 140;
+
+    circle.style.strokeDasharray = circumference;
+
+    function updateDisplay() {
+      const hours = Math.floor(remaining / 3600);
+      const minutes = Math.floor((remaining % 3600) / 60);
+      const seconds = remaining % 60;
+
+      document.getElementById("hours").textContent = hours;
+      document.getElementById("min-sec").textContent =
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      const offset = circumference * (1 - remaining / totalTime);
+      circle.style.strokeDashoffset = offset;
+    }
+
+    function startCountdown() {
+      updateDisplay();
+      const timer = setInterval(() => {
+        if (remaining <= 0) {
+          clearInterval(timer);
+          // Aquí puedes poner una acción cuando termina (como mostrar un mensaje)
+        } else {
+          remaining--;
+          updateDisplay();
+        }
+      }, 1000);
+    }
+
+    startCountdown();
+  </script>
+</body>
+</html>
